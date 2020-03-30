@@ -1,0 +1,33 @@
+<!doctype html>
+<form name="publish">
+  <input type="text" name="message" maxlength="50"/>
+  <input type="submit" value="Send"/>
+</form>
+
+<div id="messages"></div>
+
+<script>
+  
+let fill =[];
+let socket = new WebSocket('ws://localhost:8080/ws');
+
+socket.onopen = (e) => console.log(e);
+// handle incoming messages
+socket.onmessage = function(event) {
+  let incomingMessage = event.data;
+  showMessage(incomingMessage);
+};
+
+socket.onclose = event => console.log(`Closed ${event.code}`);
+
+// show message in div#messages
+function showMessage(message) {
+  fill.push(message);
+  let messageElem = document.createElement('div');
+  messageElem.textContent = message;
+  document.getElementById('messages').prepend(messageElem);
+  if(fill.length > 5){
+    socket.close(1000, "If don't need more data...");
+  }
+}
+</script>
